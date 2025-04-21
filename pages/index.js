@@ -5,6 +5,11 @@ export default function Home() {
   const [botStatus, setBotStatus] = useState('stopped');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: '',
+    openaiKey: ''
+  });
 
   useEffect(() => {
     // Check bot status on page load
@@ -21,12 +26,24 @@ export default function Home() {
     }
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const startBot = async () => {
     setLoading(true);
     setError('');
     try {
       const response = await fetch('/api/start', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(credentials)
       });
       const data = await response.json();
       if (data.status === 'success') {
@@ -88,12 +105,45 @@ export default function Home() {
                   </div>
                 )}
 
+                <div className="space-y-4 mb-8">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Instagram Username</label>
+                    <input
+                      type="text"
+                      name="username"
+                      value={credentials.username}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Instagram Password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={credentials.password}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">OpenAI API Key</label>
+                    <input
+                      type="password"
+                      name="openaiKey"
+                      value={credentials.openaiKey}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"
+                    />
+                  </div>
+                </div>
+
                 <div className="flex justify-center space-x-4">
                   <button
                     onClick={startBot}
-                    disabled={loading || botStatus === 'running'}
+                    disabled={loading || botStatus === 'running' || !credentials.username || !credentials.password || !credentials.openaiKey}
                     className={`px-4 py-2 rounded-md text-white font-medium ${
-                      loading || botStatus === 'running'
+                      loading || botStatus === 'running' || !credentials.username || !credentials.password || !credentials.openaiKey
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-green-500 hover:bg-green-600'
                     }`}

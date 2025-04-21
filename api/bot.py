@@ -1,4 +1,11 @@
-from flask import Flask, request, jsonify
+try:
+    from flask import Flask, request, jsonify
+except ImportError:
+    print("Flask is not installed. Installing now...")
+    import subprocess
+    subprocess.check_call(["pip", "install", "flask==2.0.1"])
+    from flask import Flask, request, jsonify
+
 import threading
 import time
 import os
